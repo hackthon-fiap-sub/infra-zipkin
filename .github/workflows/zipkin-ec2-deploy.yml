@@ -1,4 +1,4 @@
-name: Deploy e Destruir Infraestrutura com Terraform
+name: Deploy do Zipkin Infraestrutura com Terraform
 
 on:
   push:
