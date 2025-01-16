@@ -39,10 +39,10 @@ jobs:
       - name: Selecionar Workspace
         run: terraform workspace select default
 
-      - name: Terraform Destroy
+      - name: Executar Terraform Destroy
         if: ${{ github.event.inputs.confirm_destroy == 'yes' }}
         run: terraform destroy -var-file="dev.tfvars" -auto-approve -lock=false
 
-      - name: Terraform Destroy
+      - name: Cancelamento da Destruição
         if: ${{ github.event.inputs.confirm_destroy != 'yes' }}
         run: echo "A destruição da infraestrutura foi cancelada."
