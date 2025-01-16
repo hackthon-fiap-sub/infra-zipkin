@@ -1,7 +1,10 @@
 name: Destruir Infraestrutura com Terraform
 
 on:
-  workflow_dispatch: # Permite executar manualmente o workflow
+  push:
+    branches:
+      - main
+  workflow_dispatch: # Permite executar manualmente pelo GitHub Actions
     inputs:
       confirm_destroy:
         description: "Digite 'yes' para confirmar a destruição da infraestrutura"
