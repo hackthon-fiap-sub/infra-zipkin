@@ -80,9 +80,9 @@ resource "aws_security_group" "ec2_sg" {
 }
 
 # Elastic IP
-resource "aws_eip" "zipkin_ip" {
-  instance = aws_instance.zipkin.id
-}
+#resource "aws_eip" "zipkin_ip" {
+ # instance = aws_instance.zipkin.id
+#}
 
 # Instância EC2
 resource "aws_instance" "zipkin" {
