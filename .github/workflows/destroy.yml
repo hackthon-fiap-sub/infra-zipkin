@@ -1,13 +1,15 @@
-name: Deploy e Destruir Infraestrutura com Terraform
+name: Terraform Destroy
 
 on:
-  push:
-    branches:
-      - main
-  workflow_dispatch: # Permite executar manualmente pelo GitHub Actions
+  workflow_dispatch: # Permite executar manualmente o workflow
+    inputs:
+      confirm_destroy:
+        description: "Digite 'yes' para confirmar a destruição da infraestrutura"
+        required: true
+        default: "no"
 
 jobs:
-  terraform:
+  terraform-destroy:
     runs-on: ubuntu-latest
 
     steps:
@@ -29,13 +31,10 @@ jobs:
       - name: Terraform Init
         run: terraform init
 
-      - name: Terraform Plan
-        run: terraform plan -var-file="dev.tfvars"
-
-      - name: Terraform Apply
-        #if: github.event.inputs.action == 'apply' # Executa somente se a ação for "apply"
-        run: terraform apply -var-file="dev.tfvars" -auto-approve
-
       - name: Terraform Destroy
-        #if: github.event.inputs.action == 'destroy' # Executa somente se a ação for "destroy"
+        if: ${{ github.event.inputs.confirm_destroy == 'yes' }} # Executa apenas se o input for 'yes'
         run: terraform destroy -var-file="dev.tfvars" -auto-approve
+
+      - name: Aviso de cancelamento
+        if: ${{ github.event.inputs.confirm_destroy != 'yes' }} # Mostra mensagem se o input for diferente de 'yes'
+        run: echo "A destruição da infraestrutura foi cancelada."
