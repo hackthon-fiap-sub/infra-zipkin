@@ -1,0 +1,51 @@
+name: Destruir Infraestrutura com Terraform
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: # Permite executar manualmente
+    inputs:
+      confirm_destroy:
+        description: "Digite 'yes' para confirmar a destruição da infraestrutura"
+        required: true
+        default: "no"
+
+jobs:
+  terraform-destroy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Configurar AWS CLI
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.1.6
+
+      - name: Depuração do Input
+        run: echo "Input recebido: ${{ github.event.inputs.confirm_destroy }}"
+
+      - name: Terraform Init
+        run: |
+          terraform init
+          terraform state list # Lista os recursos conhecidos para depuração
+
+      - name: Selecionar Workspace
+        run: terraform workspace select default
+
+      - name: Executar Terraform Destroy
+        if: ${{ github.event.inputs.confirm_destroy == 'yes' }}
+        run: terraform destroy -var-file="dev.tfvars" -auto-approve -lock=false
+
+      - name: Cancelamento da Destruição
+        if: ${{ github.event.inputs.confirm_destroy != 'yes' }}
+        run: echo "A destruição da infraestrutura foi cancelada."
