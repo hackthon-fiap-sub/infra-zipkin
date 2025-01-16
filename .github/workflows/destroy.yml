@@ -1,12 +1,7 @@
-name: Terraform Destroy
+name: Destruir Infraestrutura com Terraform
 
 on:
-  workflow_dispatch: # Permite executar manualmente o workflow
-    inputs:
-      confirm_destroy:
-        description: "Digite 'yes' para confirmar a destruição da infraestrutura"
-        required: true
-        default: "no"
+  workflow_dispatch: # Permite executar manualmente
 
 jobs:
   terraform-destroy:
@@ -28,21 +23,8 @@ jobs:
         with:
           terraform_version: 1.1.6
 
-      - name: Depuração do Input
-        run: echo "Input recebido: ${{ github.event.inputs.confirm_destroy }}"
-
       - name: Terraform Init
-        run: |
-          terraform init
-          terraform state list # Lista os recursos conhecidos para depuração
-
-      - name: Selecionar Workspace
-        run: terraform workspace select default
+        run: terraform init
 
       - name: Terraform Destroy
-        if: ${{ github.event.inputs.confirm_destroy == 'yes' }}
         run: terraform destroy -var-file="dev.tfvars" -auto-approve -lock=false
-
-      - name: Aviso de cancelamento
-        if: ${{ github.event.inputs.confirm_destroy != 'yes' }}
-        run: echo "A destruição da infraestrutura foi cancelada."
