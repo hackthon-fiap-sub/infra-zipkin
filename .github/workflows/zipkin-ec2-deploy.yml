@@ -1,9 +1,10 @@
-name: Deploy do Zipkin para trace do fluxo de APIs
+name: Deploy e Destruir Infraestrutura com Terraform
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch: # Permite executar manualmente pelo GitHub Actions
 
 jobs:
   terraform:
@@ -32,4 +33,9 @@ jobs:
         run: terraform plan -var-file="dev.tfvars"
 
       - name: Terraform Apply
+        if: github.event.inputs.action == 'apply' # Executa somente se a ação for "apply"
         run: terraform apply -var-file="dev.tfvars" -auto-approve
+
+      - name: Terraform Destroy
+        if: github.event.inputs.action == 'destroy' # Executa somente se a ação for "destroy"
+        run: terraform destroy -var-file="dev.tfvars" -auto-approve
