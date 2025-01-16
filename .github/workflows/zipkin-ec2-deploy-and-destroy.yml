@@ -1,0 +1,65 @@
+name: Gerenciar Infraestrutura com Terraform
+
+on:
+  workflow_dispatch: # Permite executar manualmente pelo GitHub Actions
+    inputs:
+      action:
+        description: "Escolha a ação: deploy ou destroy"
+        required: true
+        default: "deploy"
+        options:
+          - deploy
+          - destroy
+      confirm_action:
+        description: "Digite 'yes' para confirmar a ação selecionada"
+        required: true
+        default: "no"
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Configurar AWS CLI
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.1.6
+
+      - name: Depuração do Input
+        run: |
+          echo "Ação selecionada: ${{ github.event.inputs.action }}"
+          echo "Confirmação recebida: ${{ github.event.inputs.confirm_action }}"
+
+      - name: Terraform Init
+        run: |
+          terraform init
+          terraform state list # Lista os recursos conhecidos para depuração
+
+      - name: Selecionar Workspace
+        run: terraform workspace select default
+
+      - name: Terraform Plan (Deploy)
+        if: ${{ github.event.inputs.action == 'deploy' && github.event.inputs.confirm_action == 'yes' }}
+        run: terraform plan -var-file="dev.tfvars"
+
+      - name: Terraform Apply (Deploy)
+        if: ${{ github.event.inputs.action == 'deploy' && github.event.inputs.confirm_action == 'yes' }}
+        run: terraform apply -var-file="dev.tfvars" -auto-approve
+
+      - name: Executar Terraform Destroy
+        if: ${{ github.event.inputs.action == 'destroy' && github.event.inputs.confirm_action == 'yes' }}
+        run: terraform destroy -var-file="dev.tfvars" -auto-approve -lock=false
+
+      - name: Cancelamento da Ação
+        if: ${{ github.event.inputs.confirm_action != 'yes' }}
+        run: echo "A ação foi cancelada pelo usuário."

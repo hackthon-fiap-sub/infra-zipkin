@@ -94,7 +94,7 @@ resource "aws_instance" "zipkin" {
   iam_instance_profile = aws_iam_instance_profile.ec2_instance_profile.name
 
   tags = {
-    Name = "zipkin-instance-${var.environment}"
+    Name = "zipkin-4-instance-${var.environment}"
   }
 
  user_data = <<-EOF
