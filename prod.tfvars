@@ -1,0 +1,6 @@
+vpc_name             = "my-vpc-prod"
+ami_id               = "ami-0abcdef1234567890"
+instance_type        = "t3.medium"
+ec2_role_name        = "ec2-zipkin-role-prod"
+security_group_name  = "ec2-zipkin-sg-prod"
+environment          = "prod"

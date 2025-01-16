@@ -1,0 +1,6 @@
+vpc_name             = "my-vpc-hom"
+ami_id               = "ami-0123456789abcdef0"
+instance_type        = "t3.micro"
+ec2_role_name        = "ec2-zipkin-role-hom"
+security_group_name  = "ec2-zipkin-sg-hom"
+environment          = "hom"
