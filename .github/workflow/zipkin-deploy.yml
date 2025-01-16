@@ -1,4 +1,4 @@
-name: Deploy do Zipkin para trace das APIs
+name: Deploy do Zipkin para trace do fluxo de APIs
 on:
   push:
     branches:
