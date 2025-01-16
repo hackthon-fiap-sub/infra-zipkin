@@ -43,10 +43,14 @@ jobs:
       - name: Terraform Init
         run: |
           terraform init
-          terraform state list # Lista os recursos conhecidos para depuração
 
-      - name: Selecionar Workspace
-        run: terraform workspace select default
+      - name: Verificar ou Criar Workspace
+        run: |
+          terraform workspace select default || terraform workspace new default
+
+      - name: Depuração do State
+        run: |
+          terraform state list || echo "Nenhum estado encontrado."
 
       - name: Terraform Plan (Deploy)
         if: ${{ github.event.inputs.action == 'deploy' && github.event.inputs.confirm_action == 'yes' }}
@@ -63,3 +67,4 @@ jobs:
       - name: Cancelamento da Ação
         if: ${{ github.event.inputs.confirm_action != 'yes' }}
         run: echo "A ação foi cancelada pelo usuário."
+        continue-on-error: true
